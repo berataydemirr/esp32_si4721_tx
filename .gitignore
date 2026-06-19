@@ -1,1 +1,5 @@
 build/
+
+# Unused / generated
+main/audio_data.h
+sdkconfig.old
