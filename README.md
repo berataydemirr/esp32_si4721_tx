@@ -90,6 +90,51 @@ All tunable parameters are defined at the top of [`main/main.c`](main/main.c):
 3. **Si4721 init** — Hardware reset → power up in FM TX mode → tune to frequency → set power → configure digital audio input → enable ACOMP
 4. **Melody loop** — Each note is a sine wave with a short attack/release envelope to prevent clicks, synthesized into a RAM buffer and streamed over I2S
 
+## Troubleshooting
+
+I ran into most of these issues during development. Sharing them here so you don't have to.
+
+### Hardware
+
+| Symptom | Likely cause | Fix |
+|:--------|:-------------|:----|
+| Si4721 not responding at all | SEN pin floating — chip doesn't know whether to use I2C or SPI | Tie **GPIO3 (SEN)** to **3.3V** through a 10kΩ pull-up for I2C mode |
+| I2C works sometimes, fails randomly | Missing or weak pull-up resistors on SDA/SCL | Add **4.7kΩ external pull-ups** to 3.3V on both lines. Internal pull-ups alone are unreliable at 100 kHz |
+| Chip resets or behaves erratically | Insufficient decoupling on VDD | Place a **100nF ceramic cap** as close to the Si4721 VDD pin as possible |
+| No RF output despite correct logs | Antenna connected to **RF IN** instead of **TX/ANT** pad | RF IN is the *receiver* input. Use the **TX** antenna pad for transmitting |
+| Weak signal / short range | Antenna too short or wrong impedance | Use a **~75 cm wire** (quarter-wave at FM band). Even 20 cm helps for bench testing |
+
+> **Before writing any code**, verify your hardware with a multimeter:
+> - 3.3V on VDD and SEN
+> - SDA/SCL idle high (~3.3V)
+> - RST goes low then high on boot
+> - BCLK, WS, DOUT toggling (use an oscilloscope if available)
+
+### I2C (Control Bus)
+
+| Symptom | Likely cause | Fix |
+|:--------|:-------------|:----|
+| `CTS timeout` — chip never reports ready | Wrong I2C address. Si4721 uses **0x11** when SEN is high, **0x63** when low | Confirm SEN wiring matches your `SI4721_ADDR` define |
+| `ACK` failures on every transaction | Bus contention or incorrect pin assignment | Double-check SDA/SCL pin numbers. Run an I2C scan to see what's on the bus |
+| `NACK` after POWER_UP command | Chip not fully booted after reset | Increase the delay after RST goes high — **100ms minimum**, some boards need 200ms |
+
+### I2S (Audio Bus)
+
+| Symptom | Likely cause | Fix |
+|:--------|:-------------|:----|
+| Silence — no audio at all | I2S clock not running or wrong format | Si4721 expects **Philips (I2S) standard**, MSB-first, 32-bit slots. Verify `I2S_STD_PHILIPS_SLOT_DEFAULT_CONFIG` is used |
+| Distorted or garbled audio | Sample rate mismatch between I2S and Si4721 property `0x0103` | Both must match — default is **48000 Hz** (`0xBB80`) |
+| Audio plays too fast or too slow | BCLK frequency wrong | At 48 kHz / 32-bit / stereo, BCLK should be **~3.072 MHz**. The Si4721 needs ≥ 2 MHz |
+| Clicks or pops between notes | No envelope on note transitions | Apply a short **attack/release ramp** (5–25 ms) to avoid discontinuities |
+
+### Software
+
+| Symptom | Likely cause | Fix |
+|:--------|:-------------|:----|
+| Task crash / stack overflow | Audio buffer allocated on the task stack | Always use `malloc()` for audio buffers. Keep task stack at **4096+** bytes |
+| `ESP_ERR_TIMEOUT` on SD card init | SD card not inserted or wrong pins | If you're not using SD, remove all SDMMC/FATFS code and dependencies from `CMakeLists.txt` |
+| Build fails with missing `fatfs` or `sdmmc` | Leftover dependencies in `CMakeLists.txt` | Component `REQUIRES` should only list `driver` if SD is not used |
+
 ## Project Structure
 
 ```
