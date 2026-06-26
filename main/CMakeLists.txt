@@ -1,3 +1,19 @@
-idf_component_register(SRCS "main.c"
-                       REQUIRES driver
-                       INCLUDE_DIRS ".")
+idf_component_register(
+    SRCS
+        "main.c"
+        "si4721.c"
+        "i2s_audio.c"
+        "sd_player.c"
+        "sd_logger.c"
+        "uart_cmd.c"
+        "config_manager.c"
+    INCLUDE_DIRS "."
+    REQUIRES
+        driver
+        esp_driver_i2s
+        fatfs
+        sdmmc
+        esp_driver_sdmmc
+        vfs
+        esp_system
+)

@@ -1,0 +1,29 @@
+# FM Transceiver Settings
+# Copy this file to SD card as "settings.txt"
+
+# Mode: TX (transmitter) or RX (receiver)
+mode=TX
+
+# Frequency (MHz x 100): 9010=90.10, 10800=108.00
+frequency=9010
+
+# TX power (dBuV): 88-120
+tx_power=90
+
+# Audio deviation (10Hz units): 6825=68.25kHz
+deviation=6825
+
+# Pre-emphasis: 50us (Europe) or 75us (USA)
+preemphasis=50us
+
+# RDS station name (max 8 chars)
+rds_ps=FM TX
+
+# RDS scrolling text (max 64 chars)
+rds_rt=ESP32 FM TRANSMITTER
+
+# Playlist (comma separated)
+playlist=audio.wav
+
+# Auto play on boot (true/false)
+autoplay=true
