@@ -1,29 +1,26 @@
-# FM Transceiver Settings
-# Copy this file to SD card as "settings.txt"
+# ABE Teknoloji FM Verici Ayarlari
+# Bu dosyayi SD karta "settings.txt" olarak kopyalayin
 
-# Mode: TX (transmitter) or RX (receiver)
-mode=TX
-
-# Frequency (MHz x 100): 9010=90.10, 10800=108.00
+# Frekans (MHz x 100): 9010=90.10, 10800=108.00
 frequency=9010
 
-# TX power (dBuV): 88-120
+# Yayin gucu (dBuV): 88-120
 tx_power=90
 
-# Audio deviation (10Hz units): 6825=68.25kHz
+# Ses sapmasi (10Hz birim): 6825=68.25kHz
 deviation=6825
 
-# Pre-emphasis: 50us (Europe) or 75us (USA)
+# Pre-emphasis: 50us (Turkiye/Avrupa) veya 75us (ABD)
 preemphasis=50us
 
-# RDS station name (max 8 chars)
-rds_ps=FM TX
+# RDS istasyon adi (max 8 karakter)
+rds_ps=AMBULANS
 
-# RDS scrolling text (max 64 chars)
-rds_rt=ESP32 FM TRANSMITTER
+# RDS kayan yazi (max 64 karakter)
+rds_rt=YOL VERIN AMBULANS GECIYOR
 
-# Playlist (comma separated)
-playlist=audio.wav
+# Oynatma listesi (virgul ile ayir)
+playlist=ambulans.wav,siren.wav
 
-# Auto play on boot (true/false)
+# Acilista otomatik cal (true/false)
 autoplay=true
